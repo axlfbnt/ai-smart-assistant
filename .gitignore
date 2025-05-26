@@ -1,0 +1,11 @@
+# Sensitive or runtime data
+chat_history.json
+.streamlit/secrets.toml
+
+# Python junk
+__pycache__/
+*.pyc
+
+# Virtual env
+venv/
+.env

@@ -1,0 +1,9 @@
+streamlit
+requests
+pytz
+watchdog
+torch
+transformers
+opencv-python
+Pillow
+timm
