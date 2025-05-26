@@ -1,8 +1,9 @@
+# image_detection/detect.py
+
 import streamlit as st
-import cv2
 import numpy as np
 import torch
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 from transformers import DetrImageProcessor, DetrForObjectDetection
 
 @st.cache_resource
@@ -16,30 +17,33 @@ processor, model, id2label = load_model()
 
 def detect_objects(image, confidence_threshold=0.5, max_detections=20):
     if isinstance(image, np.ndarray):
-        image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        image = Image.fromarray(image)
 
     with torch.no_grad():
         inputs = processor(images=image, return_tensors="pt")
         outputs = model(**inputs)
 
     target_sizes = torch.tensor([image.size[::-1]])
-    results = processor.post_process_object_detection(outputs, target_sizes=target_sizes, threshold=confidence_threshold)[0]
+    results = processor.post_process_object_detection(
+        outputs, target_sizes=target_sizes, threshold=confidence_threshold)[0]
 
-    img_array = np.array(image)
+    # Draw boxes on copy of image
+    img_draw = image.copy()
+    draw = ImageDraw.Draw(img_draw)
+    
     sorted_indices = sorted(range(len(results["scores"])), key=lambda i: results["scores"][i], reverse=True)[:max_detections]
-
     for idx in sorted_indices:
         score = results["scores"][idx]
         label = results["labels"][idx]
-        box = results["boxes"][idx]
-        box = [round(i) for i in box.tolist()]
+        box = results["boxes"][idx].tolist()
         class_name = id2label[label.item()]
-        confidence = round(score.item(), 3)
-        cv2.rectangle(img_array, (box[0], box[1]), (box[2], box[3]), (0, 255, 0), 2)
-        cv2.putText(img_array, f"{class_name}: {confidence:.2f}", (box[0], box[1]-10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        confidence = round(score.item(), 2)
 
-    return img_array
+        x0, y0, x1, y1 = map(int, box)
+        draw.rectangle([x0, y0, x1, y1], outline="lime", width=2)
+        draw.text((x0, y0 - 10), f"{class_name}: {confidence:.2f}", fill="lime")
+
+    return img_draw
 
 def run_image_detection():
     st.sidebar.subheader("🖼️ Image Detection Settings")
@@ -51,7 +55,7 @@ def run_image_detection():
     uploaded_img = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
     if uploaded_img is not None:
-        image = Image.open(uploaded_img)
+        image = Image.open(uploaded_img).convert("RGB")
         st.image(image, caption="Gambar Diupload", use_container_width=True)
 
         if st.button("Detect Objects"):
