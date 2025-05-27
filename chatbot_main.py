@@ -26,7 +26,7 @@ def run_chatbot():
         chat_data = st.session_state.all_chats.get(st.session_state.current_chat_id, {})
         chat_title = chat_data.get("title", chat_title)
 
-    st.title("🤖 AI Chatbot Streamlit")
+    # st.title("🤖 AI Chatbot Streamlit")
 
     with st.sidebar:
         st.header("💬 Navigasi Chat")
@@ -55,7 +55,7 @@ def run_chatbot():
                         st.rerun()
             with row[1]:
                 if rename_chat_id == chat_id:
-                    if st.button("📏", key=f"save_{chat_id}"):
+                    if st.button("📥", key=f"save_{chat_id}"):
                         new_val = st.session_state.get(f"input_{chat_id}", "").strip()
                         if new_val:
                             st.session_state.all_chats[chat_id]["title"] = new_val
