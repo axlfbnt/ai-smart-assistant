@@ -26,7 +26,7 @@ def run_chatbot():
         chat_data = st.session_state.all_chats.get(st.session_state.current_chat_id, {})
         chat_title = chat_data.get("title", chat_title)
 
-    st.title("🤖 AI Chatbot Streamlit")
+    # st.title("🤖 AI Chatbot Streamlit")
 
     # Sidebar
     with st.sidebar:
