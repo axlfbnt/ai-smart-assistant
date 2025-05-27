@@ -4,12 +4,11 @@ pytz
 watchdog
 torch
 transformers
+timm
 opencv-python
 Pillow
-timm
 numpy
-python-docx
-PyMuPDF
-openpyxl
-pdfplumber
 pandas
+python-docx
+pdfplumber
+openpyxl
