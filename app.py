@@ -5,7 +5,7 @@ import streamlit as st
 # ✅ HARUS paling atas
 st.set_page_config(page_title="AI Multi Tool", layout="wide")
 
-st.title("🧠 AI Smart Assistant")
+st.title("🤖 AI Smart Assistant")
 
 # Dropdown dengan label unik
 mode = st.sidebar.selectbox(
