@@ -26,8 +26,9 @@ def run_chatbot():
         chat_data = st.session_state.all_chats.get(st.session_state.current_chat_id, {})
         chat_title = chat_data.get("title", chat_title)
 
-    # st.title("🤖 AI Chatbot Streamlit")
+    st.title("🤖 AI Chatbot Streamlit")
 
+    # Sidebar
     with st.sidebar:
         st.header("💬 Navigasi Chat")
         if st.button("+ Chat Baru"):
@@ -79,11 +80,15 @@ def run_chatbot():
         st.markdown("---")
         st.subheader("Pengaturan")
         model_names = list(AVAILABLE_MODELS.keys())
-        st.session_state.selected_model_name = st.selectbox("Model AI", model_names, index=model_names.index(st.session_state.selected_model_name))
+        st.session_state.selected_model_name = st.selectbox(
+            "Model AI", model_names, index=model_names.index(st.session_state.selected_model_name)
+        )
 
+    # Chat UI
     chat_messages = get_chat_messages()
     if not chat_messages:
         st.markdown("### 💬 Mulai percakapan baru...")
+
     for msg in chat_messages:
         with st.chat_message(msg['role'], avatar="👤" if msg['role'] == "user" else "🤖"):
             st.markdown(msg['content_text'])
@@ -92,6 +97,7 @@ def run_chatbot():
     uploaded_file = render_file_uploader()
     user_prompt = st.chat_input("Ketik pesan...")
 
+    # Process
     if user_prompt and not st.session_state.generating:
         st.session_state.generating = True
         model_info = AVAILABLE_MODELS[st.session_state.selected_model_name]
@@ -103,13 +109,10 @@ def run_chatbot():
             extracted_text = extract_text_from_file(uploaded_file)
             filename_note = f"(berkas: `{uploaded_file.name}`)"
             if not extracted_text.strip():
-                add_message_to_chat("user", user_prompt)
-                add_message_to_chat("assistant", "⚠️ File tidak berisi teks yang dapat dibaca.")
-                st.session_state.generating = False
-                reset_uploader()
-                st.rerun()
+                st.warning("⚠️ File berhasil diunggah, tapi tidak berisi teks yang bisa dibaca. Mungkin berupa gambar atau hasil scan.")
+                extracted_text = "(⚠️ Tidak ada teks yang bisa dibaca dari file)"
 
-        full_prompt = f"{user_prompt}\n\n---\n\U0001F4C4 File terlampir: `{uploaded_file.name}`" if uploaded_file else user_prompt
+        full_prompt = f"{user_prompt}\n\n---\n📄 File terlampir: `{uploaded_file.name}`" if uploaded_file else user_prompt
 
         if user_prompt.startswith("!"):
             response = handle_command(user_prompt, model_info, chat_messages)
@@ -126,13 +129,14 @@ def run_chatbot():
                 get_chat_messages(),
                 st.session_state.get("system_prompt", "Halo, saya siap membantu.")
             )
+
             if extracted_text:
                 prompt_messages.append({"role": "user", "content": extracted_text})
 
             with st.chat_message("assistant", avatar="🤖"):
                 placeholder = st.empty()
                 full_response = ""
-                for chunk in get_response_stream(prompt_messages, model_info['id']):
+                for chunk in get_response_stream(prompt_messages, model_info["id"]):
                     full_response += chunk
                     placeholder.markdown(full_response + "▌")
                 placeholder.markdown(full_response)
@@ -143,5 +147,6 @@ def run_chatbot():
             st.session_state.generating = False
             if st.session_state.play_sound_once:
                 play_notification_sound()
+
             reset_uploader()
             st.rerun()
