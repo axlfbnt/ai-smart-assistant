@@ -8,3 +8,8 @@ opencv-python
 Pillow
 timm
 numpy
+python-docx
+PyMuPDF
+openpyxl
+pdfplumber
+pandas
