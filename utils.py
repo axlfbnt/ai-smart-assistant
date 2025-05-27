@@ -36,7 +36,6 @@ def format_time_export(ts):
     return convert_to_local(ts).strftime("%Y-%m-%d %H:%M:%S %Z%z") if isinstance(ts, datetime.datetime) else str(ts)
 
 # Chat title auto-update
-
 def update_chat_title(chat_id, prompt):
     if not chat_id in st.session_state.all_chats:
         return
@@ -57,7 +56,6 @@ def update_chat_title(chat_id, prompt):
     chat['title'] = title
 
 # Notification sound
-
 def play_notification_sound(sound_path=SOUND_NOTIFICATION_FILE):
     if not st.session_state.get("play_sound_once", False):
         return
@@ -88,3 +86,49 @@ def play_notification_sound(sound_path=SOUND_NOTIFICATION_FILE):
             st.warning(f"Gagal memutar suara notifikasi: {e}", icon="🔊")
     else:
         st.warning(f"File suara tidak ditemukan: {sound_path}", icon="🔊")
+
+# File content extraction
+def extract_text_from_file(file):
+    import io
+    import pandas as pd
+
+    file_name = file.name.lower()
+
+    if file_name.endswith(".pdf"):
+        import pdfplumber
+        try:
+            with pdfplumber.open(file) as pdf:
+                text = "\n".join(page.extract_text() or "" for page in pdf.pages)
+                return text.strip()
+        except Exception:
+            return "PDF tidak dapat dibaca."
+
+    elif file_name.endswith(".docx"):
+        try:
+            from docx import Document
+            document = Document(file)
+            return "\n".join([para.text for para in document.paragraphs]).strip()
+        except Exception:
+            return "DOCX tidak dapat dibaca."
+
+    elif file_name.endswith(".csv"):
+        try:
+            df = pd.read_csv(file)
+            return df.to_string(index=False)
+        except Exception:
+            return "CSV tidak dapat dibaca."
+
+    elif file_name.endswith(".xlsx"):
+        try:
+            df = pd.read_excel(file)
+            return df.to_string(index=False)
+        except Exception:
+            return "XLSX tidak dapat dibaca."
+
+    elif file_name.endswith(".txt"):
+        try:
+            return file.read().decode("utf-8").strip()
+        except Exception:
+            return "TXT tidak dapat dibaca."
+
+    return "Format file tidak dikenali."

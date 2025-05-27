@@ -2,14 +2,17 @@
 
 def run_chatbot():
     import streamlit as st
+    import os
     from config import AVAILABLE_MODELS
     from state import init_session_state
     from chat_manager import create_chat, reset_chats, get_chat_messages, add_message_to_chat, switch_chat
     from llm_handler import prepare_messages, get_response_stream, handle_command
-    from utils import play_notification_sound, format_time_display
+    from utils import play_notification_sound, format_time_display, extract_text_from_file
     from storage import save_all_chats, load_all_chats
+    from components.file_uploader_display import init_uploader_state, render_file_uploader, reset_uploader
 
     init_session_state()
+    init_uploader_state()
     load_all_chats()
 
     if not st.session_state.all_chats:
@@ -23,7 +26,7 @@ def run_chatbot():
         chat_data = st.session_state.all_chats.get(st.session_state.current_chat_id, {})
         chat_title = chat_data.get("title", chat_title)
 
-    # st.title("🤖 AI Chatbot Streamlit")
+    st.title("🤖 AI Chatbot Streamlit")
 
     with st.sidebar:
         st.header("💬 Navigasi Chat")
@@ -52,7 +55,7 @@ def run_chatbot():
                         st.rerun()
             with row[1]:
                 if rename_chat_id == chat_id:
-                    if st.button("💾", key=f"save_{chat_id}"):
+                    if st.button("📏", key=f"save_{chat_id}"):
                         new_val = st.session_state.get(f"input_{chat_id}", "").strip()
                         if new_val:
                             st.session_state.all_chats[chat_id]["title"] = new_val
@@ -86,11 +89,27 @@ def run_chatbot():
             st.markdown(msg['content_text'])
             st.caption(format_time_display(msg['timestamp']))
 
+    uploaded_file = render_file_uploader()
     user_prompt = st.chat_input("Ketik pesan...")
 
     if user_prompt and not st.session_state.generating:
         st.session_state.generating = True
         model_info = AVAILABLE_MODELS[st.session_state.selected_model_name]
+
+        extracted_text = ""
+        filename_note = ""
+
+        if uploaded_file:
+            extracted_text = extract_text_from_file(uploaded_file)
+            filename_note = f"(berkas: `{uploaded_file.name}`)"
+            if not extracted_text.strip():
+                add_message_to_chat("user", user_prompt)
+                add_message_to_chat("assistant", "⚠️ File tidak berisi teks yang dapat dibaca.")
+                st.session_state.generating = False
+                reset_uploader()
+                st.rerun()
+
+        full_prompt = f"{user_prompt}\n\n---\n\U0001F4C4 File terlampir: `{uploaded_file.name}`" if uploaded_file else user_prompt
 
         if user_prompt.startswith("!"):
             response = handle_command(user_prompt, model_info, chat_messages)
@@ -99,13 +118,16 @@ def run_chatbot():
                 add_message_to_chat("assistant", response)
             save_all_chats()
             st.session_state.generating = False
+            reset_uploader()
             st.rerun()
         else:
-            add_message_to_chat("user", user_prompt)
+            add_message_to_chat("user", full_prompt)
             prompt_messages = prepare_messages(
                 get_chat_messages(),
                 st.session_state.get("system_prompt", "Halo, saya siap membantu.")
             )
+            if extracted_text:
+                prompt_messages.append({"role": "user", "content": extracted_text})
 
             with st.chat_message("assistant", avatar="🤖"):
                 placeholder = st.empty()
@@ -113,7 +135,6 @@ def run_chatbot():
                 for chunk in get_response_stream(prompt_messages, model_info['id']):
                     full_response += chunk
                     placeholder.markdown(full_response + "▌")
-
                 placeholder.markdown(full_response)
                 add_message_to_chat("assistant", full_response)
                 st.session_state.play_sound_once = True
@@ -122,4 +143,5 @@ def run_chatbot():
             st.session_state.generating = False
             if st.session_state.play_sound_once:
                 play_notification_sound()
+            reset_uploader()
             st.rerun()
