@@ -1,6 +1,6 @@
 # 🧠 AI Smart Assistant
 
-A multi-feature Streamlit app combining Chatbot, Object Detection, and Image Detection — powered by LLMs (via OpenRouter) and HuggingFace Transformers.
+A multi-feature Streamlit app combining Chatbot, Object Detection, Image Analysis, and Text-to-Speech — powered by OpenRouter and HuggingFace Transformers.
 
 ---
 
@@ -15,7 +15,7 @@ A multi-feature Streamlit app combining Chatbot, Object Detection, and Image Det
 - ✅ **Auto-clear file uploader after chat**
 - ✅ **Validates file content (warns if unreadable like scanned PDFs)**
 
-### 👁️ Vision Track (Webcam Object Detection)
+### 🎥 Vision Track (Webcam Object Detection)
 - Uses `facebook/detr-resnet-50` from HuggingFace
 - Real-time detection with bounding boxes
 - Adjustable confidence, resolution, and FPS skip
@@ -25,6 +25,12 @@ A multi-feature Streamlit app combining Chatbot, Object Detection, and Image Det
 - Upload `.jpg/.png` images
 - Visualize object detection bounding boxes
 - Powered by the same DETR model
+
+### 🔈 Text-to-Speech (TTS)
+- Convert any text into spoken audio
+- Uses Google Text-to-Speech (`gTTS`)
+- Supports Bahasa Indonesia and other languages
+- Download-free audio playback inside the app
 
 ---
 
@@ -40,6 +46,8 @@ A multi-feature Streamlit app combining Chatbot, Object Detection, and Image Det
 │   └── detect.py                     # Real-time webcam detection
 ├── image_detection/
 │   └── detect.py                     # Image upload detection
+├── text_to_speech/
+│   └── run.py                        # Text-to-Speech app logic
 ├── chat_manager.py                   # Chat session management
 ├── llm_handler.py                    # API calls to OpenRouter
 ├── config.py                         # Settings and model config
@@ -59,7 +67,7 @@ A multi-feature Streamlit app combining Chatbot, Object Detection, and Image Det
 
 ### 1. Clone this repo
 ```bash
-git clone https://github.com/axlfbnt/ai-smart-assistant.git
+git clone https://github.com/your-username/ai-smart-assistant.git
 cd ai-smart-assistant
 ```
 
@@ -92,7 +100,7 @@ streamlit run app.py
 
 ## 📦 Requirements
 
-Make sure this is in your `requirements.txt`:
+Your `requirements.txt` should include:
 
 ```txt
 streamlit
@@ -109,6 +117,7 @@ pandas
 python-docx
 pdfplumber
 openpyxl
+gTTS
 ```
 
 ---
@@ -119,6 +128,7 @@ openpyxl
 - In **Chatbot**, type messages and attach documents to ask questions about them
 - In **Vision Track**, detect objects live via webcam
 - In **Image Lens**, upload an image and auto-detect objects
+- In **Text-to-Speech**, convert your typed input into audio and play it in-app
 
 ---
 
@@ -128,6 +138,7 @@ openpyxl
 - [Hugging Face Transformers](https://huggingface.co/facebook/detr-resnet-50)
 - [Streamlit](https://streamlit.io/)
 - [pdfplumber / docx / openpyxl / pandas] for file parsing
+- [gTTS (Google Text-to-Speech)](https://pypi.org/project/gTTS/)
 
 ---
 
@@ -137,6 +148,7 @@ openpyxl
 - `chat_history.json` stores chat state locally
 - Never commit `.streamlit/secrets.toml` to public repos
 - File attachments are cleared after chat is sent
+- Some Streamlit Cloud environments may block `gTTS` or audio playback
 
 ---
 
