@@ -13,7 +13,7 @@ def run_text_to_speech():
             st.warning("Mohon masukkan teks terlebih dahulu.")
             return
 
-        tts = gTTS(text)
+        tts = gTTS(text, lang="id")
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
             tts.save(fp.name)
             st.audio(fp.name, format="audio/mp3")
