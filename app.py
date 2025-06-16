@@ -28,5 +28,7 @@ elif mode == "🖼️ Image Lens":
     run_image_detection()
 
 elif mode == "🔊 Text-to-Speech":
-    from text_to_speech.run import run_text_to_speech
-    run_text_to_speech()
+    # from text_to_speech.run import run_text_to_speech
+    # run_text_to_speech()
+    from image_detection.detect import run_image_detection
+    run_image_detection()
