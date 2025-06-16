@@ -3,7 +3,6 @@ from gtts import gTTS
 import tempfile
 
 def run_text_to_speech():
-    st.title("🔊 Text to Speech")
     st.write("Ketik teks di bawah untuk diubah menjadi suara.")
 
     text = st.text_area("Masukkan teks:", height=150)

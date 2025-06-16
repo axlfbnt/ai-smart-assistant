@@ -10,8 +10,8 @@ st.title("🤖 AI Smart Assistant")
 # Dropdown dengan label unik
 mode = st.sidebar.selectbox(
     "🧩 Pilih Mode Aplikasi",
-    # ["💬 Chat Mind", "🎥 Vision Track", "🖼️ Image Lens", "🔈 Text-to-Speech"]
-    ["💬 Chat Mind", "🖼️ Image Lens", "🔈 Text-to-Speech"]
+    # ["💬 Chat Mind", "🎥 Vision Track", "🖼️ Image Lens", "🔊 Text-to-Speech"]
+    ["💬 Chat Mind", "🖼️ Image Lens", "🔊 Text-to-Speech"]
 )
 
 # Jalankan modul sesuai pilihan
