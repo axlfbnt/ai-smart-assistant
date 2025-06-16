@@ -10,8 +10,8 @@ st.title("🤖 AI Smart Assistant")
 # Dropdown dengan label unik
 mode = st.sidebar.selectbox(
     "🧩 Pilih Mode Aplikasi",
-    # ["💬 Chat Mind", "🎥 Vision Track", "🖼️ Image Lens"]
-    ["💬 Chat Mind", "🖼️ Image Lens"]
+    # ["💬 Chat Mind", "🎥 Vision Track", "🖼️ Image Lens", "🔈 Text-to-Speech"]
+    ["💬 Chat Mind", "🖼️ Image Lens", "🔈 Text-to-Speech"]
 )
 
 # Jalankan modul sesuai pilihan
@@ -26,3 +26,7 @@ if mode == "💬 Chat Mind":
 elif mode == "🖼️ Image Lens":
     from image_detection.detect import run_image_detection
     run_image_detection()
+
+elif mode == "🔊 Text-to-Speech":
+    from text_to_speech.run import run_text_to_speech
+    run_text_to_speech()
