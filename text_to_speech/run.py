@@ -1,18 +1,19 @@
 import streamlit as st
 from gtts import gTTS
+import os
 import tempfile
 
 def run_text_to_speech():
-    st.write("Ketik teks di bawah untuk diubah menjadi suara.")
+    st.markdown("Masukkan teks di bawah ini untuk diubah menjadi suara.")
 
-    text = st.text_area("Masukkan teks:", height=150)
+    text = st.text_area("Teks:", placeholder="Ketik sesuatu untuk dibacakan...")
 
-    if st.button("🔉 Ubah ke Suara"):
-        if text.strip():
-            tts = gTTS(text, lang='id')  # atau 'en' untuk Bahasa Inggris
+    if st.button("🔈 Convert & Play"):
+        if not text.strip():
+            st.warning("Mohon masukkan teks terlebih dahulu.")
+            return
 
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
-                tts.save(fp.name)
-                st.audio(fp.name, format="audio/mp3")
-        else:
-            st.warning("Teks tidak boleh kosong.")
+        tts = gTTS(text)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
+            tts.save(fp.name)
+            st.audio(fp.name, format="audio/mp3")
