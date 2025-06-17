@@ -17,12 +17,3 @@ def run_text_to_speech():
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
             tts.save(fp.name)
             st.audio(fp.name, format="audio/mp3")
-            
-            with open(fp.name, "rb") as f:
-                audio_data = f.read()
-                st.download_button(
-                    label="Download MP3",
-                    data=audio_data,
-                    file_name="text_to_speech.mp3",
-                    mime="audio/mp3"
-                )
